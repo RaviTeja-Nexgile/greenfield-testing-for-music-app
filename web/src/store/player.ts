@@ -12,7 +12,7 @@ export interface Song {
   duration: number;
   /** Optional cover image URL. */
   coverUrl?: string;
-  /** Optional audio stream URL. */
+  /** Optional audio stream URL (the song's actual audio file). */
   audioUrl?: string;
 }
 
@@ -81,9 +81,94 @@ function syncMediaSession(): void {
   navigator.mediaSession.setActionHandler('nexttrack', next);
 }
 
+// --- Real audio element -----------------------------------------------------
+
+/**
+ * The single <audio> element the player drives. It is created lazily so the
+ * store works in non-browser environments (tests, SSR) where `Audio` is
+ * unavailable. Playback state (position, ended) is sourced from this element's
+ * events rather than a simulated tick, so the song's actual audio file plays
+ * through the device's audio output (criterion 4.9).
+ */
+let audioElement: HTMLAudioElement | null = null;
+/** The audio URL currently loaded into the element, to avoid redundant loads. */
+let loadedAudioUrl: string | null = null;
+
+function getAudioElement(): HTMLAudioElement | null {
+  if (typeof Audio === 'undefined') {
+    return null;
+  }
+  if (!audioElement) {
+    audioElement = new Audio();
+    audioElement.preload = 'auto';
+    audioElement.addEventListener('timeupdate', () => {
+      if (audioElement && !Number.isNaN(audioElement.currentTime)) {
+        state = { ...state, position: audioElement.currentTime };
+        emit();
+      }
+    });
+    audioElement.addEventListener('ended', () => {
+      // The song finished: advance to the next one.
+      next();
+    });
+    audioElement.addEventListener('error', () => {
+      // A load failure leaves the element paused; keep the store consistent.
+      if (state.isPlaying) {
+        state = { ...state, isPlaying: false };
+        emit();
+      }
+    });
+  }
+  return audioElement;
+}
+
+/**
+ * Reconcile the <audio> element with the current store state: load the current
+ * song's audio file, apply volume, and play or pause. Called after every state
+ * change that affects playback.
+ */
+function syncAudio(): void {
+  const el = getAudioElement();
+  if (!el) {
+    return;
+  }
+  const song = currentSong(state);
+
+  if (!song) {
+    if (loadedAudioUrl !== null) {
+      el.pause();
+      el.removeAttribute('src');
+      el.load();
+      loadedAudioUrl = null;
+    }
+    return;
+  }
+
+  const url = song.audioUrl ?? '';
+  if (loadedAudioUrl !== url) {
+    el.src = url;
+    loadedAudioUrl = url;
+  }
+
+  el.volume = state.volume;
+
+  if (state.isPlaying) {
+    // Ignore the "not implemented" rejection jsdom throws for play().
+    const p = el.play();
+    if (p && typeof p.catch === 'function') {
+      p.catch(() => {
+        /* no-op in environments without real audio output */
+      });
+    }
+  } else {
+    el.pause();
+  }
+}
+
 function setState(next: PlayerState) {
   state = next;
   syncMediaSession();
+  syncAudio();
   emit();
 }
 
@@ -216,15 +301,22 @@ export function seek(position: number): void {
   const max = song ? song.duration : 0;
   const clamped = Math.max(0, Math.min(position, max));
   setState({ ...state, position: clamped });
+  const el = getAudioElement();
+  if (el && !Number.isNaN(el.duration) && el.duration > 0) {
+    el.currentTime = clamped;
+  }
 }
 
-/** Advance the position by a number of seconds (used by the tick timer). */
+/**
+ * Advance the position by a number of seconds. Kept for callers that still
+ * drive playback manually; real playback advances position from the <audio>
+ * element's `timeupdate` events instead.
+ */
 export function tick(deltaSeconds: number): void {
   const song = currentSong(state);
   if (!song || !state.isPlaying) return;
   const nextPosition = state.position + deltaSeconds;
   if (nextPosition >= song.duration) {
-    // Song finished: advance to the next one.
     setState({ ...state, position: song.duration });
     next();
   } else {
@@ -234,6 +326,12 @@ export function tick(deltaSeconds: number): void {
 
 /** Reset the store to its initial state (used by tests). */
 export function resetPlayer(): void {
+  loadedAudioUrl = null;
+  if (audioElement) {
+    audioElement.pause();
+    audioElement.removeAttribute('src');
+    audioElement.load();
+  }
   setState(initialState);
 }
 
