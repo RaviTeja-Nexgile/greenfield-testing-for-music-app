@@ -8,7 +8,7 @@
   - _Area: setup_
   - _Issue: #1_
 
-- [ ] 2. Sign in and sign up screen
+- [x] 2. Sign in and sign up screen
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6_
   - _Depends: 1_
   - _Files: web/src/pages/SignIn.tsx, web/src/pages/SignIn.module.css, server/src/routes/auth.ts, server/src/auth/**, server/src/__tests__/auth.test.ts_
@@ -127,7 +127,7 @@
   - _Area: deploy_
   - _Issue: #15_
 
-- [ ] 16. Real audio playback
+- [x] 16. Real audio playback
   - Replace the simulated playback with real audio: the stream endpoint serves the song's actual audio bytes, and the player drives an `<audio>` element so the song's audio file plays through the device's audio output (criterion 4.9). Update the player store and playback tests that task 6 wrote to cover real audio instead of the simulated tick, and update any journey saved in `e2e/` that tests what task 6 built.
   - _Requirements: 4.9_
   - _Depends: 1, 3, 6_
@@ -147,7 +147,7 @@
   - _Area: database_
   - _Issue: #21_
 
-- [ ] 18. Professional look and feel
+- [x] 18. Professional look and feel
   - Apply the shared colours, font and spacing from the approved tokens to every screen so they look like one app (criterion 14.1), and make every screen lay out correctly on a phone and on a desktop (criterion 14.2). Write the tokens as CSS variables in the shared stylesheet and have each screen's own styles use them.
   - _Requirements: 14.1, 14.2_
   - _Depends: 1, 3_
