@@ -43,7 +43,7 @@
   - _Area: ui_
   - _Issue: #5_
 
-- [ ] 6. Now playing screen and playback
+- [x] 6. Now playing screen and playback
   - _Requirements: 4.1, 4.8_
   - _Depends: 1, 3_
   - _Files: web/src/pages/Player.tsx, web/src/pages/Player.module.css, web/src/store/player.ts, server/src/routes/playback.ts, server/src/__tests__/playback.test.ts_
