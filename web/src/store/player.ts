@@ -55,8 +55,35 @@ function emit() {
   }
 }
 
+/**
+ * Keep the browser's Media Session in sync with the player so playback
+ * continues (and shows lock-screen / OS controls) when the listener switches
+ * to another app or locks the screen (criterion 4.8).
+ */
+function syncMediaSession(): void {
+  if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) {
+    return;
+  }
+  const song = currentSong(state);
+  if (!song) {
+    return;
+  }
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title: song.title,
+    artist: song.artist,
+    album: '',
+    artwork: song.coverUrl ? [{ src: song.coverUrl }] : [],
+  });
+  navigator.mediaSession.playbackState = state.isPlaying ? 'playing' : 'paused';
+  navigator.mediaSession.setActionHandler('play', () => setPlaying(true));
+  navigator.mediaSession.setActionHandler('pause', () => setPlaying(false));
+  navigator.mediaSession.setActionHandler('previoustrack', previous);
+  navigator.mediaSession.setActionHandler('nexttrack', next);
+}
+
 function setState(next: PlayerState) {
   state = next;
+  syncMediaSession();
   emit();
 }
 
