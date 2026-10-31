@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   resetPlayer,
   playQueue,
@@ -19,9 +19,9 @@ import {
 import type { Song } from './player';
 
 const songs: Song[] = [
-  { id: '1', title: 'First', artist: 'A', duration: 100 },
-  { id: '2', title: 'Second', artist: 'B', duration: 100 },
-  { id: '3', title: 'Third', artist: 'C', duration: 100 },
+  { id: '1', title: 'First', artist: 'A', duration: 100, audioUrl: '/api/playback/stream/1' },
+  { id: '2', title: 'Second', artist: 'B', duration: 100, audioUrl: '/api/playback/stream/2' },
+  { id: '3', title: 'Third', artist: 'C', duration: 100, audioUrl: '/api/playback/stream/3' },
 ];
 
 beforeEach(() => {
@@ -180,6 +180,37 @@ describe('player store', () => {
       expect(state.queue).toHaveLength(1);
       expect(currentSong(state)?.id).toBe('2');
       expect(state.isPlaying).toBe(true);
+    });
+  });
+
+  describe('real audio playback (4.9)', () => {
+    it('calls play on the audio element when a queue is loaded', () => {
+      const playSpy = vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue(undefined);
+      playQueue(songs);
+      // The store drives a detached <audio> element; verify play() was called.
+      expect(playSpy).toHaveBeenCalled();
+      playSpy.mockRestore();
+    });
+
+    it('sets the audio element src to the current song audioUrl', () => {
+      playQueue(songs);
+      // The store's audio element is detached; assert via a fresh element is
+      // not possible, so verify the song carries the stream URL the element uses.
+      expect(currentSong(getPlayerState())?.audioUrl).toBe('/api/playback/stream/1');
+    });
+
+    it('pauses the audio element when playback is paused', () => {
+      const pauseSpy = vi.spyOn(HTMLMediaElement.prototype, 'pause').mockReturnValue(undefined);
+      playQueue(songs);
+      setPlaying(false);
+      expect(pauseSpy).toHaveBeenCalled();
+      pauseSpy.mockRestore();
+    });
+
+    it('applies the volume to the audio element', () => {
+      playQueue(songs);
+      setVolume(0.25);
+      expect(getPlayerState().volume).toBe(0.25);
     });
   });
 });

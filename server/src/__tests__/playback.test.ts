@@ -5,14 +5,29 @@ import { findSongById } from '../routes/playback.js';
 
 describe('playback endpoints', () => {
   describe('GET /api/playback/stream/:id', () => {
-    it('returns the song metadata for a known song', async () => {
+    it('streams the song audio bytes as a WAV file', async () => {
       const app = createApp();
       const res = await request(app).get('/api/playback/stream/song-1');
       expect(res.status).toBe(200);
-      expect(res.body.song.id).toBe('song-1');
-      expect(res.body.song.title).toBe('Midnight Drive');
-      expect(res.body.song.artist).toBe('Luna Vega');
-      expect(res.body.song.duration).toBe(222);
+      expect(res.headers['content-type']).toContain('audio/wav');
+      expect(res.headers['accept-ranges']).toBe('bytes');
+      // A valid WAV starts with the RIFF/WAVE magic bytes.
+      const body = res.body as Buffer;
+      expect(body.subarray(0, 4).toString('ascii')).toBe('RIFF');
+      expect(body.subarray(8, 12).toString('ascii')).toBe('WAVE');
+      // The audio length matches the song's duration (8-bit mono @ 8 kHz).
+      const expectedSize = 44 + 222 * 8000;
+      expect(body.length).toBe(expectedSize);
+    });
+
+    it('supports HTTP Range requests for seeking', async () => {
+      const app = createApp();
+      const res = await request(app)
+        .get('/api/playback/stream/song-1')
+        .set('Range', 'bytes=0-99');
+      expect(res.status).toBe(206);
+      expect(res.headers['content-range']).toBe('bytes 0-99/1776044');
+      expect(res.headers['content-length']).toBe('100');
     });
 
     it('returns 404 for an unknown song', async () => {

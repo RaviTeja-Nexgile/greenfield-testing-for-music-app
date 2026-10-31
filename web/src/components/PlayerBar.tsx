@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react';
 import {
   usePlayer,
   currentSong,
@@ -9,7 +8,6 @@ import {
   cycleRepeat,
   setVolume,
   seek,
-  tick,
 } from '../store/player';
 import styles from './PlayerBar.module.css';
 
@@ -23,14 +21,9 @@ function formatTime(seconds: number): string {
 export default function PlayerBar() {
   const player = usePlayer();
   const song = currentSong(player);
-  const progressRef = useRef<HTMLInputElement>(null);
 
-  // Advance playback position while playing.
-  useEffect(() => {
-    if (!player.isPlaying) return;
-    const id = window.setInterval(() => tick(1), 1000);
-    return () => window.clearInterval(id);
-  }, [player.isPlaying]);
+  // Playback position is driven by the <audio> element in the player store
+  // (real audio, criterion 4.9), so no simulated tick timer is needed here.
 
   if (!song) {
     return null;
@@ -131,7 +124,6 @@ export default function PlayerBar() {
         <div className={styles.progress}>
           <span className={styles.time}>{formatTime(player.position)}</span>
           <input
-            ref={progressRef}
             type="range"
             className={styles.range}
             min={0}

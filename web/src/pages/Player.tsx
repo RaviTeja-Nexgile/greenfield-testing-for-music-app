@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   usePlayer,
@@ -10,7 +10,6 @@ import {
   cycleRepeat,
   setVolume,
   seek,
-  tick,
 } from '../store/player';
 import styles from './Player.module.css';
 
@@ -25,14 +24,9 @@ export default function Player() {
   const player = usePlayer();
   const song = currentSong(player);
   const [error, setError] = useState(false);
-  const progressRef = useRef<HTMLInputElement>(null);
 
-  // Advance playback position while playing (mirrors PlayerBar).
-  useEffect(() => {
-    if (!player.isPlaying) return;
-    const id = window.setInterval(() => tick(1), 1000);
-    return () => window.clearInterval(id);
-  }, [player.isPlaying]);
+  // Playback position is driven by the <audio> element in the player store
+  // (real audio, criterion 4.9), so no simulated tick timer is needed here.
 
   // Empty state: nothing loaded in the queue.
   if (!song) {
@@ -104,7 +98,6 @@ export default function Player() {
             <div className={styles.progress}>
               <span className={styles.time}>{formatTime(player.position)}</span>
               <input
-                ref={progressRef}
                 type="range"
                 className={styles.range}
                 min={0}
