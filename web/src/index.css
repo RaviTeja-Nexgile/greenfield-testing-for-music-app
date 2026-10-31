@@ -153,6 +153,22 @@ button {
   gap: 12px;
 }
 
+.signout-btn {
+  background: none;
+  border: 1px solid var(--outline);
+  border-radius: 0.5rem;
+  padding: 8px 14px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: background-color 150ms ease-out, color 150ms ease-out;
+}
+
+.signout-btn:hover {
+  background: var(--surface-variant);
+  color: var(--text);
+}
+
 .avatar {
   width: 36px;
   height: 36px;
