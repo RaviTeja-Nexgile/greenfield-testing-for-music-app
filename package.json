@@ -1,0 +1,20 @@
+{
+  "name": "music-streaming-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Resonance — a full-stack music streaming web app (React, Node.js, PostgreSQL, S3).",
+  "workspaces": [
+    "web",
+    "server"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace server",
+    "dev:web": "npm run dev --workspace web",
+    "build": "npm run build --workspace web && npm run build --workspace server",
+    "test": "npm run test --workspace server && npm run test --workspace web",
+    "seed": "npm run seed --workspace server"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
