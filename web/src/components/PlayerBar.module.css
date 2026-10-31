@@ -9,7 +9,7 @@
   display: flex;
   align-items: center;
   gap: 20px;
-  box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.1);
+  box-shadow: var(--shadow-lg);
   z-index: 20;
 }
 
@@ -25,7 +25,7 @@
 .playerCover {
   width: 48px;
   height: 48px;
-  border-radius: 0.5rem;
+  border-radius: var(--radius-md);
   background: var(--surface-variant);
   flex-shrink: 0;
   display: flex;
@@ -87,7 +87,7 @@
   color: var(--text-muted);
   width: 36px;
   height: 36px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
