@@ -1,6 +1,6 @@
 # Tasks: Music Streaming Platform
 
-- [ ] 1. Project setup
+- [x] 1. Project setup
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6_
   - _Files: package.json, README.md, .gitignore, .env.example, docker-compose.yml, web/**, server/**, e2e/.gitkeep_
   - _Verify: npm install_
