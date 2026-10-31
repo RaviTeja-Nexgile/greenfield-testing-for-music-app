@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import { config } from './config.js';
+import { playbackRouter } from './routes/playback.js';
 
 export function createApp() {
   const app = express();
@@ -10,6 +11,8 @@ export function createApp() {
   app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok', service: 'music-streaming-platform', time: new Date().toISOString() });
   });
+
+  app.use('/api/playback', playbackRouter());
 
   return app;
 }
