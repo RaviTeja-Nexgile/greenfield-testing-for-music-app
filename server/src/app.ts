@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { config } from './config.js';
 import { playbackRouter } from './routes/playback.js';
+import { authRouter } from './routes/auth.js';
 
 export function createApp() {
   const app = express();
@@ -13,6 +14,7 @@ export function createApp() {
   });
 
   app.use('/api/playback', playbackRouter());
+  app.use('/api/auth', authRouter());
 
   return app;
 }

@@ -10,7 +10,7 @@ describe('App routing', () => {
         <App />
       </MemoryRouter>,
     );
-    expect(screen.getByRole('heading', { name: /sign in/i })).toBeTruthy();
-    expect(screen.getByText(/sign up/i)).toBeTruthy();
+    expect(screen.getByRole('heading', { name: /welcome back/i })).toBeTruthy();
+    expect(screen.getByText(/create an account/i)).toBeTruthy();
   });
 });

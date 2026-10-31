@@ -8,21 +8,32 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // A tiny file-backed store so the seeded test logins survive `npm run dev`
 // restarts without needing a running PostgreSQL instance during local setup.
 // Later tasks replace this with the real ORM + PostgreSQL layer.
-const DATA_DIR = process.env.DATA_DIR ?? join(__dirname, '..', '..', '.data');
-const USERS_FILE = join(DATA_DIR, 'users.json');
+// Read DATA_DIR lazily so tests can set process.env.DATA_DIR after the module
+// has already been imported (ESM imports are hoisted, so a top-level read would
+// capture the default before a test's override runs and silently write into the
+// real .data directory, clobbering the seeded test logins).
+function dataDir(): string {
+  return process.env.DATA_DIR ?? join(__dirname, '..', '..', '.data');
+}
+
+function usersFile(): string {
+  return join(dataDir(), 'users.json');
+}
 
 function ensureDir(): void {
-  if (!existsSync(DATA_DIR)) {
-    mkdirSync(DATA_DIR, { recursive: true });
+  const dir = dataDir();
+  if (!existsSync(dir)) {
+    mkdirSync(dir, { recursive: true });
   }
 }
 
 export function loadUsers(): User[] {
-  if (!existsSync(USERS_FILE)) {
+  const file = usersFile();
+  if (!existsSync(file)) {
     return [];
   }
   try {
-    return JSON.parse(readFileSync(USERS_FILE, 'utf8')) as User[];
+    return JSON.parse(readFileSync(file, 'utf8')) as User[];
   } catch {
     return [];
   }
@@ -30,7 +41,7 @@ export function loadUsers(): User[] {
 
 export function saveUsers(users: User[]): void {
   ensureDir();
-  writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), 'utf8');
+  writeFileSync(usersFile(), JSON.stringify(users, null, 2), 'utf8');
 }
 
 export function findUserByEmail(email: string): User | undefined {
