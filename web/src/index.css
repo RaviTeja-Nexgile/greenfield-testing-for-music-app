@@ -1,0 +1,15 @@
+:root {
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --on-primary: #ffffff;
+  --background: #f8fafc;
+  --surface: #ffffff;
+  --surface-variant: #f1f5f9;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --outline: #e2e8f0;
+  --outline-variant: #eef2f7;
+  --focus-ring: #c7d2fe;
+  --error: #dc2626;
+  --font: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}

@@ -4,3 +4,33 @@
 .nexgile/greenfield/checkpoints/
 .nexgile/greenfield/mockups/
 docs/input/
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+web/dist/
+server/dist/
+
+# Local data (seeded users, etc.)
+server/.data/
+.data/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Test / coverage
+coverage/
