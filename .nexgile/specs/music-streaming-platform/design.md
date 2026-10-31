@@ -4,6 +4,8 @@
 
 Resonance is a full-stack music streaming web app. Listeners stream music, create playlists, mark songs as liked and get personalized recommendations; uploaders submit their own songs with audio, cover image and metadata; admins review uploads and manage users. Full catalog access costs 20 euros a month. The app runs on React (frontend), Node.js (backend API), PostgreSQL (database) and AWS S3 (audio and cover storage), and deploys to AWS.
 
+The app ships with a seeded catalog of songs whose audio files are already in S3, so a listener can play music the moment they sign in, before anyone uploads anything. Playback is real audio: the browser plays the song's audio file through the device's audio output, and an approved upload's audio file becomes streamable the same way.
+
 The app is a single web app for all three roles. A person opens `/` and, when not signed in, sees the sign-in page. After signing in, a listener or uploader lands on the home page, and an admin lands on the admin dashboard. The app is in Spanish and English, uses the Madrid time zone and the euro, and meets WCAG 2.2 AA.
 
 ## Architecture
@@ -18,7 +20,7 @@ flowchart LR
   API --> Pay[Payment provider]
 ```
 
-- **Frontend** — React SPA with client-side routing. A shared app shell (sidebar, top bar, fixed player bar) wraps every signed-in screen. The player state lives in a client-side store so playback continues as the user navigates.
+- **Frontend** — React SPA with client-side routing. A shared app shell (sidebar, top bar, fixed player bar) wraps every signed-in screen. The player state lives in a client-side store so playback continues as the user navigates. Playback uses an `<audio>` element fed by the stream endpoint, so the song's actual audio file plays through the device's audio output and keeps playing in the background via the browser's media session.
 - **Backend** — Express API under `/api`, with JWT authentication, role checks (listener, uploader, admin), and a scheduled job that recalculates recommendations daily at midnight.
 - **Database** — PostgreSQL, accessed through an ORM with migrations.
 - **Storage** — AWS S3 for audio files and cover images, with signed upload URLs so files never pass through the API.
@@ -52,8 +54,8 @@ flowchart LR
 ### API areas
 
 - **Auth** — sign up, sign in, sign out, consent to data treatment.
-- **Catalog** — songs, albums, artists, genres; search.
-- **Playback** — stream a song, record a listen.
+- **Catalog** — songs, albums, artists, genres; search. The seeded catalog is part of this area.
+- **Playback** — stream a song's audio file, record a listen.
 - **Library** — playlists, liked songs.
 - **Recommendations** — personalized and popular selections.
 - **Uploads** — create, edit, delete a song; signed S3 upload URLs.
@@ -64,7 +66,7 @@ flowchart LR
 ## Data Models
 
 - **User** — id, name, email, password hash, role (listener, uploader, admin), subscription state, consent flag, created/closed dates.
-- **Song** — id, title, artist, album, genre, audio key, cover key, duration, state (pending, approved, rejected), rejection reason, uploader id, submitted/approved dates.
+- **Song** — id, title, artist, album, genre, audio key, cover key, duration, state (pending, approved, rejected), rejection reason, uploader id, submitted/approved dates. Seeded songs are pre-approved with their audio keys already in S3.
 - **Album** — id, title, artist, cover key.
 - **Artist** — id, name.
 - **Playlist** — id, name, owner id, ordered song list.
@@ -112,19 +114,17 @@ Deploy: aws
 
 The approved mock-ups: `agent_generated/ui-preview/sign-in.html`, `agent_generated/ui-preview/home.html`, `agent_generated/ui-preview/search.html`, `agent_generated/ui-preview/player.html`, `agent_generated/ui-preview/admin-dashboard.html`. Their colours and font are in `.nexgile/greenfield/tokens.json`; build the screens with them.
 
-- Font: Poppins, Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif
+- Font: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif
 - Colours:
-  - primary: `#7c3aed`
-  - primary-hover: `#6d28d9`
+  - primary: `#4f46e5`
+  - primary-hover: `#4338ca`
   - on-primary: `#ffffff`
-  - background: `#0f172a`
-  - surface: `#1e293b`
-  - surface-variant: `#334155`
-  - text: `#f8fafc`
-  - text-muted: `#94a3b8`
-  - outline: `#475569`
-  - outline-variant: `#334155`
-  - focus-ring: `#c4b5fd`
-  - error: `#f87171`
-
-- Sign-in page: full-screen animated gradient background with floating music-note shapes, a subtle particle effect, and a glassmorphism sign-in card with smooth entrance animations.
+  - background: `#f8fafc`
+  - surface: `#ffffff`
+  - surface-variant: `#f1f5f9`
+  - text: `#0f172a`
+  - text-muted: `#64748b`
+  - outline: `#e2e8f0`
+  - outline-variant: `#eef2f7`
+  - focus-ring: `#c7d2fe`
+  - error: `#dc2626`

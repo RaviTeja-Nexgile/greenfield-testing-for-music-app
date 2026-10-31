@@ -80,6 +80,8 @@ _Source: W1, F2, N1_
 
 4.8 WHILE a song is playing THE SYSTEM SHALL keep playing it when the listener switches to another app or locks the screen.
 
+4.9 WHEN a listener plays a song THE SYSTEM SHALL play the song's audio file through the device's audio output.
+
 ## Requirement 5: Playlists
 
 **User Story:** As a listener, I want to create and manage playlists, so that I can group the songs I like.
@@ -145,6 +147,8 @@ _Source: W2, G2, E1, BR1, BR2, N3_
 8.5 THE SYSTEM SHALL complete an upload within 30 seconds.
 
 8.6 WHEN an uploader submits a song THE SYSTEM SHALL record who uploaded it and when.
+
+8.7 WHEN an admin approves an uploaded song THE SYSTEM SHALL make its audio file available to stream.
 
 ## Requirement 9: Manage uploaded songs
 
@@ -215,6 +219,30 @@ _Source: E5, F37, F39, F40_
 12.2 WHEN a listener asks to delete their account THE SYSTEM SHALL delete their personal data within 30 days.
 
 12.3 WHEN a listener closes their account THE SYSTEM SHALL delete their personal data 30 days later.
+
+## Requirement 13: Songs ready to play
+
+**User Story:** As a listener, I want songs already in the app when I sign in, so that I can play music right away.
+
+_Source: G1, W1, M3_
+
+### Acceptance Criteria
+
+13.1 WHEN a listener signs in THE SYSTEM SHALL show songs they can play without uploading anything.
+
+13.2 WHEN a listener taps a song THE SYSTEM SHALL play its audio file.
+
+## Requirement 14: Professional look and feel
+
+**User Story:** As a listener, I want the app to look professional, so that it feels like a polished music app.
+
+_Source: F1, F19, F44_
+
+### Acceptance Criteria
+
+14.1 THE SYSTEM SHALL show every screen with the same colours, font and spacing.
+
+14.2 THE SYSTEM SHALL lay out every screen correctly on a phone and on a desktop.
 
 ## Later releases
 
