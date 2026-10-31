@@ -17,7 +17,7 @@
   - _Area: ui_
   - _Issue: #2_
 
-- [ ] 3. App shell, sidebar, top bar and player bar
+- [x] 3. App shell, sidebar, top bar and player bar
   - _Requirements: 4.2, 4.3, 4.4, 4.5, 4.6, 4.7_
   - _Depends: 1_
   - _Files: web/src/App.tsx, web/src/components/AppShell.tsx, web/src/components/Sidebar.tsx, web/src/components/TopBar.tsx, web/src/components/PlayerBar.tsx, web/src/components/PlayerBar.module.css, web/src/store/player.ts_
